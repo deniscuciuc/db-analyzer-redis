@@ -60,7 +60,7 @@
     "postbuild": "node scripts/add-shebang.js",
     "lint": "biome check .",
     "lint:fix": "biome check --write .",
-    "test": "node --test dist/tests/**/*.test.js",
+    "test": "node --test dist/tests/*.test.js",
     "prepublishOnly": "pnpm lint && pnpm build && pnpm test",
     "release:patch": "npm version patch && git push && git push --tags",
     "release:minor": "npm version minor && git push && git push --tags",
