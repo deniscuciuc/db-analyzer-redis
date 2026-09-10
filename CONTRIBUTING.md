@@ -4,7 +4,7 @@ Contributions are welcome. Here is how to get started quickly.
 
 ## Prerequisites
 
-- Node.js >= 20
+- Node.js 22+
 - pnpm >= 10
 - A reachable Redis instance
 
