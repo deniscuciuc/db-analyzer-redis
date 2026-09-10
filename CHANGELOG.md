@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.1] - 2026-09-10
+
+### Fixed
+
+- Name `@types/node` explicitly in `tsconfig.json`. TypeScript 7 no longer reliably
+  auto-includes it, which can leave every Node global unresolved. This repository happened
+  to still resolve them, but the sibling analyzers did not — pinning it explicitly removes
+  the difference.
+
 ## [1.2.0] - 2026-09-10
 
 ### Changed
