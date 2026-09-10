@@ -42,45 +42,48 @@ export function parseOptions(argv = process.argv.slice(2)): ParsedOptions {
 		switch (argv[index]) {
 			case "--host":
 			case "-h":
-				options.host = argv[++index];
+				options.host = requireValue("--host", argv[++index]);
 				break;
 			case "--port":
 			case "-p":
-				options.port = Number.parseInt(argv[++index], 10);
+				options.port = parseNumericFlag("--port", argv[++index]);
 				break;
 			case "--password":
 			case "-a":
-				options.password = argv[++index];
+				options.password = requireValue("--password", argv[++index]);
 				break;
 			case "--db":
 			case "-n":
-				options.db = Number.parseInt(argv[++index], 10);
+				options.db = parseNumericFlag("--db", argv[++index]);
 				break;
 			case "--tls":
 				options.tls = true;
 				break;
 			case "--uri":
-				options.uri = argv[++index];
+				options.uri = requireValue("--uri", argv[++index]);
 				break;
 			case "--output":
 			case "-o":
-				options.outputDir = argv[++index];
+				options.outputDir = requireValue("--output", argv[++index]);
 				break;
 			case "--profile":
-				options.profile = argv[++index];
+				options.profile = requireValue("--profile", argv[++index]);
 				break;
 			case "--config":
-				options.config = argv[++index];
+				options.config = requireValue("--config", argv[++index]);
 				break;
 			case "--compare":
-				options.compare = argv[++index];
+				options.compare = requireValue("--compare", argv[++index]);
 				break;
 			case "--html":
 				options.html = true;
 				break;
 			case "--watch": {
 				const nextValue = argv[index + 1];
-				if (nextValue && !nextValue.startsWith("-")) {
+				// A bare "-" prefix is not enough to tell a flag from a negative number:
+				// `--watch -1` used to be read as a flag and silently fall back to the
+				// default instead of being rejected.
+				if (nextValue !== undefined && /^-?\d+$/.test(nextValue)) {
 					options.watch = Number.parseInt(nextValue, 10);
 					index++;
 				} else {
@@ -89,10 +92,16 @@ export function parseOptions(argv = process.argv.slice(2)): ParsedOptions {
 				break;
 			}
 			case "--slow-threshold":
-				options.slowCommandThreshold = Number.parseInt(argv[++index], 10);
+				options.slowCommandThreshold = parseNumericFlag(
+					"--slow-threshold",
+					argv[++index],
+				);
 				break;
 			case "--max-slow-commands":
-				options.maxSlowCommands = Number.parseInt(argv[++index], 10);
+				options.maxSlowCommands = parseNumericFlag(
+					"--max-slow-commands",
+					argv[++index],
+				);
 				break;
 			case "--help":
 				printHelp();
@@ -108,13 +117,23 @@ export function parseOptions(argv = process.argv.slice(2)): ParsedOptions {
 				break;
 			case "--command":
 			case "-c":
-				options.command = argv[++index];
+				options.command = requireValue("--command", argv[++index]);
 				break;
 			case "--interactive":
 			case "-i":
 			case "start":
 				options.interactive = true;
 				break;
+			default: {
+				// Previously ignored, so a typo like --jsno silently produced human output.
+				const token = argv[index];
+				if (token?.startsWith("-")) {
+					throw new Error(
+						`Unknown option: ${token}. Run --help for the list of options.`,
+					);
+				}
+				break;
+			}
 		}
 	}
 
@@ -140,6 +159,34 @@ export function toAnalyzerOptions(options: ParsedOptions): AnalyzerOptions {
 		maxSlowCommands: options.maxSlowCommands,
 		outputDir: options.outputDir,
 	};
+}
+
+/**
+ * Parses a numeric flag value, rejecting a missing or non-numeric one.
+ *
+ * `Number.parseInt` returns NaN for both, which used to flow into the driver and surface
+ * as a confusing error far from the actual mistake.
+ */
+function parseNumericFlag(flag: string, value: string | undefined): number {
+	if (value === undefined || value.startsWith("-")) {
+		throw new Error(`${flag} requires a value.`);
+	}
+
+	const parsed = Number.parseInt(value, 10);
+	if (!Number.isFinite(parsed) || parsed <= 0) {
+		throw new Error(`${flag} must be a positive number, got '${value}'.`);
+	}
+
+	return parsed;
+}
+
+/** Parses a string flag value, rejecting a missing one. */
+function requireValue(flag: string, value: string | undefined): string {
+	if (value === undefined) {
+		throw new Error(`${flag} requires a value.`);
+	}
+
+	return value;
 }
 
 function printHelp(): void {

@@ -108,7 +108,7 @@ test("parseSlowLogEntries normalizes slowlog rows", () => {
 		[1, 1718500000, 12000, ["KEYS", "*"], "127.0.0.1:50000"],
 	]);
 
-	assert.equal(slowCommands[0].durationMs, 12);
-	assert.equal(slowCommands[0].commandPreview, "KEYS *");
-	assert.equal(slowCommands[0].clientAddr, "127.0.0.1:50000");
+	assert.equal(slowCommands[0]!.durationMs, 12);
+	assert.equal(slowCommands[0]!.commandPreview, "KEYS *");
+	assert.equal(slowCommands[0]!.clientAddr, "127.0.0.1:50000");
 });

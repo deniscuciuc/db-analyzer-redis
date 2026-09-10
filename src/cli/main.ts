@@ -1,11 +1,11 @@
 import Redis from "ioredis";
-import { parseOptions } from "./src/cli/options";
-import { executeCommand } from "./src/cli/runner";
-import { loadConfig, resolveProfile } from "./src/config/loader";
-import { DEFAULTS } from "./src/constants";
-import { InteractiveCLI } from "./src/interactive";
-import type { RedisConnection } from "./src/types";
-import { runWatchLoop } from "./src/watch/runner";
+import { loadConfig, resolveProfile } from "../config/loader";
+import { DEFAULTS } from "../constants";
+import { InteractiveCLI } from "../interactive";
+import type { RedisConnection } from "../types";
+import { runWatchLoop } from "../watch/runner";
+import { parseOptions } from "./options";
+import { executeCommand } from "./runner";
 
 function resolveValue<T>(
 	cliValue: T | undefined,
@@ -181,9 +181,21 @@ async function main(): Promise<void> {
 				lazyConnect: true,
 			});
 
+	// ioredis emits 'error' on every failed reconnect attempt. With no listener
+	// Node treats it as an unhandled error event and kills the process, which is
+	// near-certain in watch mode.
+	client.on("error", (error: Error) => {
+		console.warn(`Redis connection error: ${error.message}`);
+	});
+
 	try {
-		await client.connect();
-		await client.ping();
+		try {
+			await client.connect();
+			await client.ping();
+		} catch (error) {
+			const message = error instanceof Error ? error.message : String(error);
+			throw new Error(`Cannot connect to Redis: ${message}`);
+		}
 
 		if (runtimeOptions.interactive) {
 			const interactive = new InteractiveCLI(
@@ -205,9 +217,6 @@ async function main(): Promise<void> {
 		}
 
 		await executeCommand(client, runtimeOptions, connection);
-	} catch (error) {
-		const message = error instanceof Error ? error.message : String(error);
-		throw new Error(`Cannot connect to Redis: ${message}`);
 	} finally {
 		await closeClient(client);
 	}
@@ -216,5 +225,7 @@ async function main(): Promise<void> {
 main().catch((error) => {
 	const message = error instanceof Error ? error.message : String(error);
 	console.error("Error during analysis:", message);
-	process.exit(1);
+	// Set exitCode rather than calling process.exit, which can truncate buffered
+	// stdout — e.g. a large --json report being piped to a file.
+	process.exitCode = 1;
 });

@@ -1,4 +1,4 @@
-# Dependabot config for db-analyzer-postgres
+# Dependabot config for db-analyzer-redis
 # Docs: https://docs.github.com/code-security/dependabot/dependabot-version-updates
 
 version: 2
@@ -27,7 +27,7 @@ updates:
       runtime-minor-patch:
         patterns:
           - "@inquirer/*"
-          - "pg"
+          - "ioredis"
         update-types:
           - "minor"
           - "patch"

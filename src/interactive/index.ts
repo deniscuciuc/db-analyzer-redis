@@ -223,6 +223,8 @@ export class InteractiveCLI {
 		const interval = await input({
 			message: "Watch interval in seconds",
 			default: String(this.runtimeOptions.watch ?? 30),
+			validate: (value) =>
+				Number(value) > 0 ? true : "Must be a positive number",
 		});
 		await runWatchLoop({
 			intervalSeconds: Number.parseInt(interval, 10),
@@ -239,7 +241,7 @@ export class InteractiveCLI {
 
 		switch (choice) {
 			case "show":
-				console.log(this.runtimeOptions);
+				this.showSettings();
 				break;
 			case "output":
 				this.runtimeOptions.outputDir = await input({
@@ -252,6 +254,8 @@ export class InteractiveCLI {
 					await input({
 						message: "Slow command threshold in microseconds",
 						default: String(this.runtimeOptions.slowCommandThreshold),
+						validate: (value) =>
+							Number(value) > 0 ? true : "Must be a positive number",
 					}),
 					10,
 				);
@@ -261,10 +265,30 @@ export class InteractiveCLI {
 					await input({
 						message: "Max slow commands to fetch",
 						default: String(this.runtimeOptions.maxSlowCommands),
+						validate: (value) =>
+							Number(value) > 0 ? true : "Must be a positive number",
 					}),
 					10,
 				);
 				break;
 		}
+	}
+
+	/**
+	 * Print the settings that are safe to show. Dumping runtimeOptions directly
+	 * would put the connection password on screen.
+	 */
+	private showSettings(): void {
+		console.log({
+			host: this.connection.host,
+			port: this.connection.port,
+			db: this.connection.db,
+			tls: this.connection.tls ?? false,
+			password: this.connection.password ? "***" : undefined,
+			outputDir: this.runtimeOptions.outputDir,
+			slowCommandThreshold: this.runtimeOptions.slowCommandThreshold,
+			maxSlowCommands: this.runtimeOptions.maxSlowCommands,
+			profile: this.runtimeOptions.profile,
+		});
 	}
 }

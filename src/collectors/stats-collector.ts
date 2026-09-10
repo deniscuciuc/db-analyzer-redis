@@ -27,6 +27,9 @@ export function parseRedisInfo(raw: string): RedisInfo {
 		}
 
 		const [key, ...rest] = line.split(":");
+		if (key === undefined) {
+			continue;
+		}
 		map[key.trim()] = rest.join(":").trim();
 	}
 
@@ -44,6 +47,9 @@ export function parseRedisInfo(raw: string): RedisInfo {
 		const parts: Record<string, number> = {};
 		for (const part of value.split(",")) {
 			const [partKey, partValue] = part.split("=");
+			if (partKey === undefined) {
+				continue;
+			}
 			parts[partKey] = Number(partValue);
 		}
 
