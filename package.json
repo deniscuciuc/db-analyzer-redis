@@ -71,7 +71,7 @@
     "ioredis": "^5.4.1"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.3.11",
+    "@biomejs/biome": "2.5.12",
     "@types/node": "^22.15.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3"
