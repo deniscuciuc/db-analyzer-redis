@@ -107,10 +107,32 @@ test("generateReport honours the configured output directory", async () => {
 			connectedReplicas: 0,
 		},
 		memory: { status: "ok", usedMemoryBytes: 1, recommendations: [] },
-		hitRate: { hitRate: 100, hits: 1, misses: 0, status: "ok", recommendations: [] },
-		persistence: { rdbEnabled: true, aofEnabled: false, status: "ok", recommendations: [] },
-		replication: { role: "master", connectedReplicas: 0, status: "ok", recommendations: [] },
-		slowCommands: { total: 0, shown: 0, threshold: 10000, commands: [], recommendations: [] },
+		hitRate: {
+			hitRate: 100,
+			hits: 1,
+			misses: 0,
+			status: "ok",
+			recommendations: [],
+		},
+		persistence: {
+			rdbEnabled: true,
+			aofEnabled: false,
+			status: "ok",
+			recommendations: [],
+		},
+		replication: {
+			role: "master",
+			connectedReplicas: 0,
+			status: "ok",
+			recommendations: [],
+		},
+		slowCommands: {
+			total: 0,
+			shown: 0,
+			threshold: 10000,
+			commands: [],
+			recommendations: [],
+		},
 		keyspaces: [],
 		config: {},
 		recommendations: [],
@@ -118,7 +140,10 @@ test("generateReport honours the configured output directory", async () => {
 
 	const path = await analyzer.generateReport("json", report as never);
 
-	assert.ok(path.startsWith(outputDir), `${path} should be inside ${outputDir}`);
+	assert.ok(
+		path.startsWith(outputDir),
+		`${path} should be inside ${outputDir}`,
+	);
 	const written = JSON.parse(readFileSync(path, "utf8"));
 	assert.equal(written.healthScore ?? written.report?.healthScore, 90);
 

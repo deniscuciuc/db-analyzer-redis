@@ -94,7 +94,7 @@ test("analyzers produce actionable redis report data", () => {
 	assert.equal(Number(hitRate.hitRate.toFixed(1)), 90);
 	assert.equal(persistence.severity, "ok");
 	assert.equal(replication.role, "standalone");
-	assert.equal(slowCommands.topCommandTypes[0].command, "KEYS");
+	assert.equal(slowCommands.topCommandTypes[0]!.command, "KEYS");
 });
 
 test("computeHealthScore deducts for redis risks", () => {
