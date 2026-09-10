@@ -1,6 +1,6 @@
 # Redis Analyzer
 
-[![Node.js 20+](https://img.shields.io/badge/node-20%2B-339933?logo=node.js)](https://nodejs.org/)
+[![Node.js 22+](https://img.shields.io/badge/node-20%2B-339933?logo=node.js)](https://nodejs.org/)
 [![npm version](https://img.shields.io/npm/v/@deniscuciuc/redis-analyzer?logo=npm&color=cb3837)](https://www.npmjs.com/package/@deniscuciuc/redis-analyzer)
 [![npm downloads](https://img.shields.io/npm/dm/@deniscuciuc/redis-analyzer)](https://www.npmjs.com/package/@deniscuciuc/redis-analyzer)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
@@ -57,7 +57,7 @@ redis-analyzer -h your-host -p 6379 -c health
 
 ## Requirements
 
-- Node.js >= 20
+- Node.js 22+
 - pnpm >= 10
 - Redis 6+
 
