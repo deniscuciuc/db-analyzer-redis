@@ -1,11 +1,11 @@
 import Redis from "ioredis";
-import { parseOptions } from "./src/cli/options";
-import { executeCommand } from "./src/cli/runner";
-import { loadConfig, resolveProfile } from "./src/config/loader";
-import { DEFAULTS } from "./src/constants";
-import { InteractiveCLI } from "./src/interactive";
-import type { RedisConnection } from "./src/types";
-import { runWatchLoop } from "./src/watch/runner";
+import { loadConfig, resolveProfile } from "../config/loader";
+import { DEFAULTS } from "../constants";
+import { InteractiveCLI } from "../interactive";
+import type { RedisConnection } from "../types";
+import { runWatchLoop } from "../watch/runner";
+import { parseOptions } from "./options";
+import { executeCommand } from "./runner";
 
 function resolveValue<T>(
 	cliValue: T | undefined,

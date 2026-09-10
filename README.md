@@ -225,11 +225,70 @@ Score guide:
 | 50-69 | Warning |
 | 0-49 | Critical |
 
+## Programmatic usage
+
+The package has two entry points. Importing it gives you the library and does nothing else;
+the CLI is reached through the `redis-analyzer` binary.
+
+```ts
+import { RedisAnalyzer } from "@deniscuciuc/redis-analyzer";
+
+const analyzer = new RedisAnalyzer({
+  host: "localhost",
+  port: 6379,
+  password: process.env.REDIS_PASSWORD,
+  outputDir: "./reports",
+});
+
+try {
+  const report = await analyzer.analyze();
+
+  console.log(`Health score: ${report.healthScore}`);
+  for (const recommendation of report.recommendations) {
+    console.log(`- [${recommendation.severity}] ${recommendation.message}`);
+  }
+
+  // "markdown" (default), "json" or "html"; returns the path written.
+  const path = await analyzer.generateReport("json", report);
+  console.log(`Report written to ${path}`);
+} finally {
+  await analyzer.close();
+}
+```
+
+### `RedisAnalyzer`
+
+| Member | Description |
+|---|---|
+| `new RedisAnalyzer(options?)` | Opens no connection. See the option table below. |
+| `connect()` | Connects and pings. Called automatically by `analyze()`; call it directly to surface a connection failure early. |
+| `analyze()` | Runs a full analysis and resolves to a `FullRedisReport`. |
+| `generateReport(format?, report?)` | Writes a report and resolves to the file path. Generates a report first if one is not supplied. |
+| `close()` | Closes the connection. Does nothing to a client you supplied yourself. |
+
+| Option | Default | Description |
+|---|---|---|
+| `host` | `localhost` | Ignored when `uri` is set |
+| `port` | `6379` | Ignored when `uri` is set |
+| `password` | — | |
+| `db` | `0` | |
+| `tls` | `false` | TLS with the server certificate verified |
+| `uri` | — | A `redis://` or `rediss://` URI, taking precedence over the fields above |
+| `outputDir` | `./reports` | Where `generateReport` writes |
+| `slowCommandThreshold` | `10000` | Microseconds |
+| `maxSlowCommands` | `20` | |
+| `client` | — | Use an existing `ioredis` client; you keep ownership and `close()` will not disconnect it |
+
+The analyzers, collectors, reporters and every report type are exported too, so you can
+assemble a different pipeline — see [`src/index.ts`](src/index.ts) for the full surface.
+
 ## Architecture
 
 ```text
-index.ts                              # CLI bootstrap and Redis connection setup
-src/cli/{options,runner}.ts           # CLI parsing and command execution
+src/cli/main.ts                       # CLI entry point (the `redis-analyzer` binary)
+src/index.ts                          # Library entry point, no side effects
+src/api.ts                            # RedisAnalyzer, the programmatic API
+src/cli/{options,runner,validate}.ts  # CLI parsing, command execution, validation
 src/config/loader.ts                  # Config loading and profile resolution
 src/collectors/stats-collector.ts     # INFO / SLOWLOG / CONFIG collection
 src/analyzers/*.ts                    # Memory, performance, persistence, replication analysis
