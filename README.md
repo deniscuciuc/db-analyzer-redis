@@ -1,3 +1,5 @@
+![redis-analyzer](https://raw.githubusercontent.com/deniscuciuc/db-analyzer-redis/main/assets/banner.png)
+
 # Redis Analyzer
 
 [![Node.js 22+](https://img.shields.io/badge/node-20%2B-339933?logo=node.js)](https://nodejs.org/)

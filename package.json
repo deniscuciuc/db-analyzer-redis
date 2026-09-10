@@ -1,6 +1,6 @@
 {
   "name": "@deniscuciuc/redis-analyzer",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "description": "CLI tool that analyzes Redis servers for memory pressure, cache efficiency, persistence safety, replication health, and slow commands.",
   "keywords": [
     "redis",
